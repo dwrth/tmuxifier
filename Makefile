@@ -1,50 +1,43 @@
+FETCHED_FILES :=
+
+# $(1) = local file path, $(2) = remote URL, $(3) = optional post-curl command
+define FETCH_FILE
+FETCHED_FILES += $(1)
+
+$(1):
+	echo "fetching $(1)..." && \
+	mkdir -p $(dir $(1)) && \
+	curl -s -L -o $(1) $(2)$(if $(3), && $(3),)
+
+remove_$(1):
+	test -f "$(1)" && rm "$(1)" && echo "removed $(1)" || true
+
+update_$(1): remove_$(1) $(1)
+endef
+
+$(eval $(call FETCH_FILE,tests/bashunit,\
+	https://github.com/TypedDevs/bashunit/releases/download/0.26.0/bashunit,\
+	chmod +x tests/bashunit))
+
+$(eval $(call FETCH_FILE,test-legacy/test-runner.sh,\
+	https://github.com/jimeh/test-runner.sh/raw/v0.2.0/test-runner.sh,\
+	chmod +x test-legacy/test-runner.sh))
+$(eval $(call FETCH_FILE,test-legacy/assert.sh,\
+	https://raw.github.com/lehmannro/assert.sh/v1.0.2/assert.sh))
+$(eval $(call FETCH_FILE,test-legacy/stub.sh,\
+	https://raw.github.com/jimeh/stub.sh/v1.0.1/stub.sh))
+
 test: bootstrap
-	./test-runner.sh
+	./tests/bashunit $(FILE)
 
-bootstrap: test-runner.sh test/assert.sh test/stub.sh
-clean: remove_test-runner.sh remove_test/assert.sh remove_test/stub.sh
-update: update_test-runner.sh update_test/assert.sh update_test/stub.sh
+test-legacy: bootstrap
+	./test-legacy/test-runner.sh $(FILE)
 
-test-runner.sh:
-	echo "fetching test-runner.sh..." && \
-	curl -s -L -o test-runner.sh \
-		https://github.com/jimeh/test-runner.sh/raw/v0.2.0/test-runner.sh && \
-	chmod +x test-runner.sh
-
-remove_test-runner.sh:
-	( \
-		test -f "test-runner.sh" && rm "test-runner.sh" && \
-		echo "removed test-runner.sh"\
-	) || exit 0
-
-update_test-runner.sh: remove_test-runner.sh test-runner.sh
-
-test/assert.sh:
-	echo "fetching test/assert.sh..." && \
-	curl -s -L -o test/assert.sh \
-		https://raw.github.com/lehmannro/assert.sh/v1.0.2/assert.sh
-
-remove_test/assert.sh:
-	test -f "test/assert.sh" && \
-		rm "test/assert.sh" && \
-		echo "removed test/assert.sh"
-
-update_test/assert.sh: remove_test/assert.sh test/assert.sh
-
-test/stub.sh:
-	echo "fetching test/stub.sh..." && \
-	curl -s -L -o test/stub.sh \
-		https://raw.github.com/jimeh/stub.sh/v1.0.1/stub.sh
-
-remove_test/stub.sh:
-	test -f "test/stub.sh" && \
-		rm "test/stub.sh" && \
-		echo "removed test/stub.sh"
-
-update_test/stub.sh: remove_test/stub.sh test/stub.sh
+bootstrap: $(FETCHED_FILES)
+clean: $(addprefix remove_,$(FETCHED_FILES))
+update: $(addprefix update_,$(FETCHED_FILES))
 
 .SILENT:
-.PHONY: test bootstrap clean \
-	remove_test-runner.sh update_test-runner.sh \
-	remove_test/assert.sh update_test/assert.sh \
-	remove_test/stub.sh   update_test/stub.sh
+.PHONY: test bootstrap clean update \
+	$(addprefix remove_,$(FETCHED_FILES)) \
+	$(addprefix update_,$(FETCHED_FILES))

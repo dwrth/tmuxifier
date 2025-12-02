@@ -300,7 +300,7 @@ initialize_session() {
   # Tmux 1.8 and earlier.
   if [ "$(tmuxifier-tmux-version "1.9")" == "<" ]; then
     # Create the new session.
-    env TMUX="" tmuxifier-tmux new-session -d -s "$session"
+    TMUX="" tmuxifier-tmux new-session -d -s "$session"
 
     # Set default-path for session
     if [ -n "$session_root" ] && [ -d "$session_root" ]; then
@@ -317,7 +317,7 @@ initialize_session() {
       local session_args=(-c "$session_root")
     fi
 
-    env TMUX="" tmuxifier-tmux new-session \
+    TMUX="" tmuxifier-tmux new-session \
       -d -s "$session" "${session_args[@]}"
   fi
 
@@ -362,7 +362,7 @@ finalize_and_go_to_session() {
 #   /Users/jimeh/Projects
 #
 __expand_path() {
-  echo $(eval echo "$@")
+  eval echo "$*"
 }
 
 __get_first_window_index() {

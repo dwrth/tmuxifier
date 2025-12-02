@@ -47,14 +47,13 @@ unset TMUXIFIER_NO_COMPLETE
 source "${testroot}/assert.sh"
 source "${testroot}/stub.sh"
 
-
 #
 # Test Helpers
 #
 
 test-socket-tmux() {
   export TMUXIFIER_TMUX_OPTS="-L tmuxifier-tests"
-  "$TMUX_BIN" $TMUXIFIER_TMUX_OPTS $@
+  "$TMUX_BIN" $TMUXIFIER_TMUX_OPTS "$@"
 }
 
 create-test-session() {
@@ -84,4 +83,9 @@ test-socket-window-count() {
   else
     echo "$list" | wc -l | awk '{print $1}'
   fi
+}
+
+test-socket-pane-count() {
+  local list="$(test-socket-tmux list-panes -t "$session:")"
+  echo "$list" | wc -l | awk '{print $1}'
 }

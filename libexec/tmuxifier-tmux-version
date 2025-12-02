@@ -17,30 +17,6 @@ The three possible outputs are \"=\", \"<\", and \">\"."
   exit
 fi
 
-# The vercomp() function is shamelessly ripped/borrowed from the following
-# StackOverflow answer: http://stackoverflow.com/a/4025065/42146
-vercomp() {
-  if [[ $1 == $2 ]]; then return 0; fi
-
-  local IFS=.
-  local i ver1=($1) ver2=($2)
-
-  # fill empty fields in ver1 with zeros
-  for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do ver1[i]=0; done
-
-  for ((i = 0; i < ${#ver1[@]}; i++)); do
-    # fill empty fields in ver2 with zeros
-    if [[ -z ${ver2[i]} ]]; then ver2[i]=0; fi
-
-    if ((10#${ver1[i]} > 10#${ver2[i]})); then
-      return 1
-    elif ((10#${ver1[i]} < 10#${ver2[i]})); then
-      return 2
-    fi
-  done
-  return 0
-}
-
 version=$(tmux -V)
 version=${version/tmux /}
 

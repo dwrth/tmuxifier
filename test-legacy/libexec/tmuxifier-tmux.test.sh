@@ -7,12 +7,12 @@ source "${root}/lib/util.sh"
 #
 
 # Setup.
-libexec="${root}/libexec"
 test-socket-tmux new-session -d -s foobar
 test-socket-tmux new-session -d -s dude
+baseCommand="${root}/bin/tmuxifier tmux"
 
 # Passes all arguments to Tmux.
-assert "${libexec}/tmuxifier-tmux list-sessions -F \"- #{session_name}\"" \
+assert "${baseCommand} list-sessions -F \"- #{session_name}\"" \
        "- dude\n- foobar"
 
 # Tear down.

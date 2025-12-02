@@ -1,3 +1,4 @@
-test-runner.sh
-test/assert.sh
-test/stub.sh
+test-legacy/test-runner.sh
+test-legacy/assert.sh
+test-legacy/stub.sh
+test/bashunit
