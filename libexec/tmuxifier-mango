@@ -1,0 +1,98 @@
+#! /usr/bin/env bash
+set -e
+[ -n "$TMUXIFIER_DEBUG" ] && set -x
+
+# Load internal utility functions.
+source "$TMUXIFIER/lib/util.sh"
+
+# Provide tmuxifier help
+if calling-help "$@"; then
+  cat <<'EOF'
+usage: tmuxifier mango [--session-name NAME]
+
+Interactive launcher that, from the current directory, asks which app services
+to run (backend, frontend, admin, sales, organizer_app, mobile_app), then
+spawns a tmux session using the "mango" layout with valkey and ngrok infra.
+EOF
+  exit
+fi
+
+# Provide tmuxifier completions
+if calling-complete "$@"; then
+  # No special completions.
+  exit
+fi
+
+SESSION_NAME=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --session-name|-s)
+      shift
+      if [ -n "${1-}" ]; then
+        SESSION_NAME="$1"
+      fi
+      ;;
+  esac
+  shift || break
+done
+
+if ROOT=$(git rev-parse --show-toplevel 2>/dev/null); then
+  :
+else
+  ROOT="$PWD"
+fi
+
+if [ -z "$SESSION_NAME" ]; then
+  SESSION_NAME="mango-$(basename "$ROOT")"
+fi
+
+ask_yn() {
+  local prompt="$1"
+  local default="${2:-n}"
+  local suffix
+
+  if [ "$default" = "y" ] || [ "$default" = "Y" ]; then
+    suffix="[Y/n]"
+  else
+    suffix="[y/N]"
+  fi
+
+  local answer
+  read -r -p "$prompt $suffix " answer
+
+  if [ -z "$answer" ]; then
+    answer="$default"
+  fi
+
+  case "$answer" in
+    y|Y) return 0 ;;
+    *)   return 1 ;;
+  esac
+}
+
+services=("backend" "frontend" "admin" "sales" "organizer_app" "mobile_app")
+selected_services=()
+
+for svc in "${services[@]}"; do
+  default="n"
+  if [ "$svc" = "backend" ] || [ "$svc" = "frontend" ]; then
+    default="y"
+  fi
+
+  if ask_yn "Start $svc?" "$default"; then
+    selected_services+=("$svc")
+  fi
+done
+
+MANGO_SERVICES=""
+if [ "${#selected_services[@]}" -gt 0 ]; then
+  IFS=, eval 'MANGO_SERVICES="${selected_services[*]}"'
+fi
+
+export MANGO_ROOT="$ROOT"
+export MANGO_SERVICES
+export MANGO_SESSION_NAME="$SESSION_NAME"
+
+exec tmuxifier load-session mango "$SESSION_NAME"
+
