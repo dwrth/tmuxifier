@@ -25,6 +25,9 @@ has_service() {
 
 if initialize_session "$session_name"; then
 
+  # Editor window: start Cursor in project root.
+  new_window "cursor" "cursor ."
+
   # Main application window.
   new_window "app"
 
@@ -60,10 +63,10 @@ if initialize_session "$session_name"; then
           run_cmd "cd frontend && yarn dev"
           ;;
         admin)
-          run_cmd "cd admin && npm run dev"
+          run_cmd "cd admin && PORT=3001 npm run dev"
           ;;
         sales)
-          run_cmd "cd sales && npm run dev"
+          run_cmd "cd sales && PORT=3002 npm run dev"
           ;;
         organizer_app)
           run_cmd "cd organizer_app && npx expo start"
