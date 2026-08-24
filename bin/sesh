@@ -2,5 +2,4 @@
 set -e
 [ -n "$TMUXIFIER_DEBUG" ] && set -x
 
-exec tmuxifier mango "$@"
-
+exec tmuxifier sesh "$@"

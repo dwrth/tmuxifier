@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
-# Mango tmux worktree launcher session layout.
+# Sesh tmux worktree launcher session layout.
 
 session_root_dir="$HOME"
-if [ -n "${MANGO_ROOT-}" ] && [ -d "$MANGO_ROOT" ]; then
-  session_root_dir="$MANGO_ROOT"
+if [ -n "${SESH_ROOT-}" ] && [ -d "$SESH_ROOT" ]; then
+  session_root_dir="$SESH_ROOT"
 fi
 
 session_root "$session_root_dir"
 
-session_name="${MANGO_SESSION_NAME:-mango}"
+session_name="${SESH_SESSION_NAME:-sesh}"
 
 has_service() {
   local name="$1"
-  if [ -z "${MANGO_SERVICES-}" ]; then
+  if [ -z "${SESH_SERVICES-}" ]; then
     return 1
   fi
 
-  case ",$MANGO_SERVICES," in
+  case ",$SESH_SERVICES," in
     *,"$name",*) return 0 ;;
     *)           return 1 ;;
   esac
@@ -92,4 +92,3 @@ if initialize_session "$session_name"; then
 fi
 
 finalize_and_go_to_session
-

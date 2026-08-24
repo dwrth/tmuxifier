@@ -8,11 +8,11 @@ source "$TMUXIFIER/lib/util.sh"
 # Provide tmuxifier help
 if calling-help "$@"; then
   cat <<'EOF'
-usage: tmuxifier mango [--session-name NAME]
+usage: tmuxifier sesh [--session-name NAME]
 
 Interactive launcher that, from the current directory, asks which app services
 to run (backend, frontend, admin, sales, organizer_app, mobile_app), then
-spawns a tmux session using the "mango" layout with valkey and ngrok infra.
+spawns a tmux session using the "sesh" layout with valkey and ngrok infra.
 EOF
   exit
 fi
@@ -44,7 +44,7 @@ else
 fi
 
 if [ -z "$SESSION_NAME" ]; then
-  SESSION_NAME="mango-$(basename "$ROOT")"
+  SESSION_NAME="sesh-$(basename "$ROOT")"
 fi
 
 ask_yn() {
@@ -85,14 +85,13 @@ for svc in "${services[@]}"; do
   fi
 done
 
-MANGO_SERVICES=""
+SESH_SERVICES=""
 if [ "${#selected_services[@]}" -gt 0 ]; then
-  IFS=, eval 'MANGO_SERVICES="${selected_services[*]}"'
+  IFS=, eval 'SESH_SERVICES="${selected_services[*]}"'
 fi
 
-export MANGO_ROOT="$ROOT"
-export MANGO_SERVICES
-export MANGO_SESSION_NAME="$SESSION_NAME"
+export SESH_ROOT="$ROOT"
+export SESH_SERVICES
+export SESH_SESSION_NAME="$SESSION_NAME"
 
-exec tmuxifier load-session mango "$SESSION_NAME"
-
+exec tmuxifier load-session sesh "$SESSION_NAME"
