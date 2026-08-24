@@ -26,12 +26,14 @@ has_service() {
 if initialize_session "$session_name"; then
 
   # Editor window: start Cursor in project root.
-  new_window "cursor" "cursor ."
+  # Use run_cmd so the shell parses "cursor ." (new_window's command arg is exec'd as one argv).
+  new_window "cursor"
+  run_cmd "cursor ."
 
   # Main application window.
   new_window "app"
 
-  # Backend in the large top pane (pane 0).
+  # Backend in the large top pane.
   if has_service "backend"; then
     run_cmd "cd backend && npm run dev"
   fi
@@ -46,10 +48,8 @@ if initialize_session "$session_name"; then
 
   if [ "${#bottom_services[@]}" -gt 0 ]; then
     # Create a bottom row taking a smaller portion of the screen.
+    # split_v focuses the new pane; do not select_pane by index — pane-base-index may be 1.
     split_v 35
-
-    # Ensure we're on the bottom pane.
-    select_pane 1
 
     idx=0
     for svc in "${bottom_services[@]}"; do
@@ -85,6 +85,8 @@ if initialize_session "$session_name"; then
   run_cmd "valkey-server"
   split_h 50
   run_cmd "ngrok http --url=ringtail-stirring-gladly.ngrok-free.app 8080"
+
+  tmuxifier-tmux kill-window -t "$session:cursor"
 
   # Land back on the app window.
   select_window "app"
