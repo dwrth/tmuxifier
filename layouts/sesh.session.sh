@@ -83,6 +83,7 @@ if initialize_session "$session_name"; then
   # Run cursor
   new_window
   run_cmd "cursor ."
+  run_cmd "clear"
 
   # Land back on the app window.
   select_window "app"
