@@ -18,18 +18,12 @@ has_service() {
   fi
 
   case ",$SESH_SERVICES," in
-    *,"$name",*) return 0 ;;
-    *)           return 1 ;;
+  *,"$name",*) return 0 ;;
+  *) return 1 ;;
   esac
 }
 
 if initialize_session "$session_name"; then
-
-  # Editor window: start Cursor in project root.
-  # Use run_cmd so the shell parses "cursor ." (new_window's command arg is exec'd as one argv).
-  new_window "cursor"
-  run_cmd "cursor ."
-
   # Main application window.
   new_window "app"
 
@@ -59,21 +53,21 @@ if initialize_session "$session_name"; then
       fi
 
       case "$svc" in
-        frontend)
-          run_cmd "cd frontend && yarn dev"
-          ;;
-        admin)
-          run_cmd "cd admin && PORT=3001 npm run dev"
-          ;;
-        sales)
-          run_cmd "cd sales && PORT=3002 npm run dev"
-          ;;
-        organizer_app)
-          run_cmd "cd organizer_app && npx expo start"
-          ;;
-        mobile_app)
-          run_cmd "cd mobile_app && npx expo start"
-          ;;
+      frontend)
+        run_cmd "cd frontend && yarn dev"
+        ;;
+      admin)
+        run_cmd "cd admin && PORT=3001 npm run dev"
+        ;;
+      sales)
+        run_cmd "cd sales && PORT=3002 npm run dev"
+        ;;
+      organizer_app)
+        run_cmd "cd organizer_app && npx expo start"
+        ;;
+      mobile_app)
+        run_cmd "cd mobile_app && npx expo start"
+        ;;
       esac
 
       idx=$((idx + 1))
@@ -86,7 +80,9 @@ if initialize_session "$session_name"; then
   split_h 50
   run_cmd "ngrok http --url=ringtail-stirring-gladly.ngrok-free.app 8080"
 
-  tmuxifier-tmux kill-window -t "$session:cursor"
+  # Run cursor
+  new_window
+  run_cmd "cursor ."
 
   # Land back on the app window.
   select_window "app"
