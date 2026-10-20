@@ -80,13 +80,9 @@ if initialize_session "$session_name"; then
   split_h 50
   run_cmd "ngrok http --url=ringtail-stirring-gladly.ngrok-free.app 8080"
 
-  # Run cursor
-  new_window
-  run_cmd "cursor ."
-  run_cmd "clear"
-
-  # Land back on the app window.
-  select_window "app"
+  # Open nvim
+  new_window "nvim"
+  run_cmd "nvim"
 
 fi
 
